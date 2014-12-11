@@ -1,0 +1,45 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RangicUtilities", "RangicUtilities.csproj", "{882ECA41-EED8-4A4B-BB08-743FE05D355B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{C8FF74E6-5AFF-420E-9613-BF2056AF4F5B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "Tests\UnitTests\UnitTests.csproj", "{D2973F4D-4C95-4B99-B70D-57A666E48E47}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocationCheck", "Tests\LocationCheck\LocationCheck.csproj", "{BFEF34E7-E852-4B77-9178-B5A7D273046C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlaceNameAnalyzer", "Tests\PlaceNameAnalyzer\PlaceNameAnalyzer.csproj", "{045E7B08-29A8-4F5B-B2AF-01BC4407DE02}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{045E7B08-29A8-4F5B-B2AF-01BC4407DE02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{045E7B08-29A8-4F5B-B2AF-01BC4407DE02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{045E7B08-29A8-4F5B-B2AF-01BC4407DE02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{045E7B08-29A8-4F5B-B2AF-01BC4407DE02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{882ECA41-EED8-4A4B-BB08-743FE05D355B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{882ECA41-EED8-4A4B-BB08-743FE05D355B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{882ECA41-EED8-4A4B-BB08-743FE05D355B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{882ECA41-EED8-4A4B-BB08-743FE05D355B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BFEF34E7-E852-4B77-9178-B5A7D273046C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BFEF34E7-E852-4B77-9178-B5A7D273046C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BFEF34E7-E852-4B77-9178-B5A7D273046C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BFEF34E7-E852-4B77-9178-B5A7D273046C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2973F4D-4C95-4B99-B70D-57A666E48E47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2973F4D-4C95-4B99-B70D-57A666E48E47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2973F4D-4C95-4B99-B70D-57A666E48E47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2973F4D-4C95-4B99-B70D-57A666E48E47}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D2973F4D-4C95-4B99-B70D-57A666E48E47} = {C8FF74E6-5AFF-420E-9613-BF2056AF4F5B}
+		{BFEF34E7-E852-4B77-9178-B5A7D273046C} = {C8FF74E6-5AFF-420E-9613-BF2056AF4F5B}
+		{045E7B08-29A8-4F5B-B2AF-01BC4407DE02} = {C8FF74E6-5AFF-420E-9613-BF2056AF4F5B}
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Tests\UnitTests\UnitTests.csproj
+	EndGlobalSection
+EndGlobal

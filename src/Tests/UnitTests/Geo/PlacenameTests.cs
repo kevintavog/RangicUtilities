@@ -18,7 +18,7 @@ namespace UnitTests.Geo
 
         public PlacenameTests(string expectedName)
         {
-            // So each example has a unique lat/long, since it's cached otherwise.
+            // Ensure each example has a unique lat/long, since it's cached otherwise.
             latitude += 1;
 
             Location.ReverseLookupProvider = new FakeLookupProvider();
@@ -46,7 +46,7 @@ namespace UnitTests.Geo
 
         private IDictionary<string,string> expectedToRaw = new Dictionary<string,string>
         {
-            { "Salisbury, England, United Kingdom",
+            {   "Salisbury, England, United Kingdom",
                 @"{""DisplayName"":""A303, Salisbury, Wiltshire, South West England, England, United Kingdom"",""address"":{""road"":""A303"",""city"":""Salisbury"",""county"":""Wiltshire"",""state_district"":""South West England"",""state"":""England"",""country"":""United Kingdom"",""country_code"":""gb""}}" 
             },
             {   "Hood River, Oregon",

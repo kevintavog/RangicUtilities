@@ -37,7 +37,7 @@ namespace Rangic.Utilities.Process
                 return false;
             }
 
-            Invoke("-V");
+            Invoke("-ver");
             return true;
         }
     }

@@ -57,6 +57,9 @@ namespace Rangic.Utilities.Process
 
         protected void Invoke(string commandLine, params object[] args)
         {
+            outputBuffer.Clear();
+            errorBuffer.Clear();
+
             int timeout = Math.Max(1 * 1000, TimeoutSeconds * 1000);
 
             var psi = new ProcessStartInfo 

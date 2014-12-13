@@ -80,7 +80,8 @@ namespace LocationCheck
         private static void FileLocation(string filename)
         {
             Interlocked.Increment(ref FilesChecked);
-            var location = ImageDetailsReader.GetLocation(filename);
+            var imageDetails = new ImageDetails(filename);
+            var location = imageDetails.Location;
             if (location == null)
                 return;
 

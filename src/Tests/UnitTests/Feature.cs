@@ -5,7 +5,8 @@ namespace UnitTests
 {
     public enum Feature
     {
-        [FeatureDescription("Location")]
+        Image,
         Location,
+        Preferences,
     }
 }

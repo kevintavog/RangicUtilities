@@ -34,6 +34,7 @@ namespace Rangic.Utilities.Geo
         public string City { get; private set; }
         public string County { get; private set; }
         public string Country { get; private set; }
+        public string SiteName { get; private set; }
 
 
         static public IReverseLookupProvider ReverseLookupProvider { get; set; }
@@ -139,12 +140,12 @@ namespace Rangic.Utilities.Geo
 
             var parts = new List<string>();
 
-            var siteName = GetFirstMatch(PrioritizedSiteComponent, PlaceNameComponents);
+            SiteName = GetFirstMatch(PrioritizedSiteComponent, PlaceNameComponents);
             City = GetFirstMatch(PrioritizedCityNameComponent, PlaceNameComponents);
             if (filter == PlaceNameFilter.Standard)
             {
-                if (siteName != null)
-                    parts.Add(siteName);
+                if (SiteName != null)
+                    parts.Add(SiteName);
                 if (City != null)
                     parts.Add(City);
             }

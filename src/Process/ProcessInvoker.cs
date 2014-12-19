@@ -72,6 +72,9 @@ namespace Rangic.Utilities.Process
                 UseShellExecute = false,
             };
 
+            // If this executable invokes another executable in the same folder, ensure it'll be found
+            psi.EnvironmentVariables["PATH"] = Environment.GetEnvironmentVariable("PATH") + Path.PathSeparator + Path.GetDirectoryName(ProcessPath);
+
             using (var outputWaitHandle = new AutoResetEvent(false))
             using (var errorWaitHandle = new AutoResetEvent(false))
             {

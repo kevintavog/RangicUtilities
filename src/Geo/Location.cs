@@ -136,6 +136,11 @@ namespace Rangic.Utilities.Geo
 
         public string PlaceName(PlaceNameFilter filter)
         {
+            return String.Join(", ", PlaceNameParts(filter));
+        }
+
+        public string[] PlaceNameParts(PlaceNameFilter filter)
+        {
             Interlocked.Increment(ref _internalLookup);
 
             var parts = new List<string>();
@@ -201,7 +206,8 @@ namespace Rangic.Utilities.Geo
             if (!parts.Any() && PlaceNameComponents.Contains("DisplayName"))
                 parts.Add((string) PlaceNameComponents["DisplayName"]);
 
-            return String.Join(", ", parts);
+
+            return parts.ToArray();
         }
 
         private bool IsExcluded(string key, string val)

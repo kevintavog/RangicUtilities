@@ -17,7 +17,8 @@ namespace Rangic.Utilities.Geo
         {
             None,
             Minimal,
-            Standard
+            Standard,
+            Detailed,
         }
 
         static private readonly Logger logger = LogManager.GetCurrentClassLogger();
@@ -134,12 +135,12 @@ namespace Rangic.Utilities.Geo
                 return String.Format("{0:00}° {1:00}' {2:0.00000000000000}\"", degrees, minutes, seconds);
         }
 
-        public string PlaceName(PlaceNameFilter filter)
+        public string PlaceName(PlaceNameFilter filter, bool countryFirst = false)
         {
-            return String.Join(", ", PlaceNameParts(filter));
+            return String.Join(", ", PlaceNameParts(filter, countryFirst));
         }
 
-        public string[] PlaceNameParts(PlaceNameFilter filter)
+        public string[] PlaceNameParts(PlaceNameFilter filter, bool countryFirst = false)
         {
             Interlocked.Increment(ref _internalLookup);
 
@@ -172,11 +173,16 @@ namespace Rangic.Utilities.Geo
                 switch (filter)
                 {
                     case PlaceNameFilter.Standard:
-                        if (AcceptedComponents.Contains(keyString))
+                        if (AcceptedStandardComponents.Contains(keyString))
                         {
                             if (!IsExcluded(keyString, valString))
                                 parts.Add(valString);
                         }
+                        break;
+
+                    case PlaceNameFilter.Detailed:
+                        if (AcceptedDetailedComponents.Contains(keyString))
+                            parts.Add(valString);
                         break;
 
                     case PlaceNameFilter.None:
@@ -206,6 +212,8 @@ namespace Rangic.Utilities.Geo
             if (!parts.Any() && PlaceNameComponents.Contains("DisplayName"))
                 parts.Add((string) PlaceNameComponents["DisplayName"]);
 
+            if (countryFirst)
+                parts.Reverse();
 
             return parts.ToArray();
         }
@@ -294,6 +302,90 @@ namespace Rangic.Utilities.Geo
             return null;
         }
 
+        private static List<string> AcceptedStandardComponents = new List<string>
+        {
+            "state",
+            "country",
+        };
+
+        private static List<string> AcceptedDetailedComponents = new List<string>
+        {
+            "state",
+            "country",
+
+
+            // City/county details
+            "city",
+            "city_district",    // Perhaps shortest of this & city?
+            "town",
+            "hamlet",
+            "locality",
+            "neighbourhood",
+            "suburb",
+            "village",
+            "county",
+
+
+            // Site details
+            "playground",
+
+            "aerodrome",
+            "archaeological_site",
+            "arts_centre",
+            "attraction",
+            "bakery",
+            "bar",
+            "basin",
+            "building",
+            "cafe",
+            "car_wash",
+            "chemist",
+            "cinema",
+            "cycleway",
+            "department_store",
+            "fast_food",
+            "furniture",
+            "garden",
+            "garden_centre",
+            "golf_course",
+            "grave_yard",
+            "hospital",
+            "hotel",
+            "house",
+            "information",
+            "library",
+            "mall",
+            "marina",
+            "memorial",
+            "military",
+            "monument",
+            "motel",
+            "museum",
+            "park",
+            "parking",
+            "path",
+            "pedestrian",
+            "pitch",
+            "place_of_worship",
+            "pub",
+            "public_building",
+            "restaurant",
+            "roman_road",
+            "school",
+            "slipway",
+            "sports_centre",
+            "stadium",
+            "supermarket",
+            "theatre",
+            "townhall",
+            "viewpoint",
+            "water",
+            "zoo",
+
+            "footway",
+            "nature_reserve",
+        };
+
         // For 'cityname'
         private static List<string> PrioritizedCityNameComponent = new List<string>
         {
@@ -306,12 +398,6 @@ namespace Rangic.Utilities.Geo
             "suburb",
             "village",
             "county",
-        };
-
-        private static List<string> AcceptedComponents = new List<string>
-        {
-            "state",
-            "country",
         };
 
         // For the point of interest / site / building
@@ -378,7 +464,7 @@ namespace Rangic.Utilities.Geo
 
         static private IDictionary<string,IList<string>> FieldExclusions = new Dictionary<string, IList<string>>
         {
-            { "country", new List<string> { "United States of America" } }
+            { "country", new List<string> { "United States of America", "United Kingdom" } }
         };
     }
 }

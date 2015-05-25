@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net.Http;
 using NLog;
-using Newtonsoft.Json.Linq;
 
 namespace Rangic.Utilities.Geo
 {
@@ -37,11 +36,9 @@ namespace Rangic.Utilities.Geo
                         {
                             return result.Content.ReadAsStringAsync().Result;
                         }
-                        else
-                        {
-                            logger.Warn("GeoLocation request failed: {0}; {1}; {1}", 
-                                result.StatusCode, result.ReasonPhrase, result.Content.ReadAsStringAsync().Result);
-                        }
+
+                        logger.Warn("GeoLocation request failed: {0}; {1}; {1}", 
+                            result.StatusCode, result.ReasonPhrase, result.Content.ReadAsStringAsync().Result);
                     }
                     else
                     {
@@ -52,7 +49,7 @@ namespace Rangic.Utilities.Geo
             }
             catch (AggregateException ae)
             {
-                logger.Warn("Exception getting geolocation ({0} msecs):", (DateTime.Now - startTime).TotalMilliseconds);
+                logger.Warn("Exception getting geolocation ({0} msecs) for {1},{2}:", (DateTime.Now - startTime).TotalMilliseconds, latitude, longitude);
                 logger.Warn("  {0}", ae.Message);
                 foreach (var inner in ae.InnerExceptions)
                 {
@@ -67,7 +64,7 @@ namespace Rangic.Utilities.Geo
             }
             catch (Exception e)
             {
-                logger.Warn("Exception getting geolocation: {0}", e.ToString());
+                logger.Warn("Exception getting geolocation: {0} for {1},{2}", e.ToString(), latitude, longitude);
             }
 
             return null;

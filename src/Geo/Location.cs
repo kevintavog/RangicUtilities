@@ -1,13 +1,11 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Net.Http;
-using NLog;
-using Newtonsoft.Json.Linq;
-using System.Collections.Concurrent;
-using System.Text;
 using System.Threading;
+using Newtonsoft.Json.Linq;
+using NLog;
 
 namespace Rangic.Utilities.Geo
 {
@@ -268,7 +266,8 @@ namespace Rangic.Utilities.Geo
                     dynamic response = JObject.Parse(data);
                     if (response["error"] != null)
                     {
-                        logger.Warn("GeoLocation error: {0}", response.error);
+                        logger.Warn("GeoLocation error: {0} ({1}, {2})", response.error, Latitude, Longitude);
+                        logger.Warn("Full GeoLocation response: {0}", data);
                     }
 
                     if (response["display_name"] != null)

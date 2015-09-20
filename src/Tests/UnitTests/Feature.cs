@@ -1,7 +1,4 @@
-﻿using System;
-using Kekiri;
-
-namespace UnitTests
+﻿namespace UnitTests
 {
     public enum Feature
     {

@@ -39,7 +39,4 @@ Global
 		{BFEF34E7-E852-4B77-9178-B5A7D273046C} = {C8FF74E6-5AFF-420E-9613-BF2056AF4F5B}
 		{045E7B08-29A8-4F5B-B2AF-01BC4407DE02} = {C8FF74E6-5AFF-420E-9613-BF2056AF4F5B}
 	EndGlobalSection
-	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Tests\UnitTests\UnitTests.csproj
-	EndGlobalSection
 EndGlobal

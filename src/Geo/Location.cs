@@ -41,7 +41,7 @@ namespace Rangic.Utilities.Geo
 
         static Location()
         {
-            ReverseLookupProvider = new StandardLookupProvider();
+            ReverseLookupProvider = new PersistentCachingReverseLookupProvider();
         }
 
         static public bool IsNone(Location loc)
@@ -60,7 +60,7 @@ namespace Rangic.Utilities.Geo
             if (String.IsNullOrWhiteSpace(dms))
                 return Location.None;
 
-            // 47° 36' 21" N, 122° 21' 08" W [47.6057326354544 - -122.352271373751
+            // 47° 36' 21" N, 122° 21' 08" W [47.6057326354544, -122.352271373751]
             var tokens = dms.Split(',');
             if (tokens.Length != 2)
                 return Location.None;
@@ -111,12 +111,17 @@ namespace Rangic.Utilities.Geo
                 return "";
             }
 
-            char latNS = Latitude < 0 ? 'S' : 'N';
-            char longEW = Longitude < 0 ? 'W' : 'E';
-            return String.Format("{0} {1}, {2} {3}", ToDms(Latitude, forHumans), latNS, ToDms(Longitude, forHumans), longEW);
+            return ToDms(Latitude, Longitude);
         }
 
-        private string ToDms(double l, bool forHumans)
+        static public string ToDms(double latitude, double longitude)
+        {
+            char latNS = latitude < 0 ? 'S' : 'N';
+            char longEW = longitude < 0 ? 'W' : 'E';
+            return String.Format("{0} {1}, {2} {3}", ToDms(latitude, true), latNS, ToDms(longitude, true), longEW);
+        }
+
+        static private string ToDms(double l, bool forHumans)
         {
             if (l < 0)
             {
@@ -264,12 +269,6 @@ namespace Rangic.Utilities.Geo
                 try
                 {
                     dynamic response = JObject.Parse(data);
-                    if (response["error"] != null)
-                    {
-                        logger.Warn("GeoLocation error: {0} ({1}, {2})", response.error, Latitude, Longitude);
-                        logger.Warn("Full GeoLocation response: {0}", data);
-                    }
-
                     if (response["display_name"] != null)
                     {
                         pnc.Add("DisplayName", (string) response.display_name);

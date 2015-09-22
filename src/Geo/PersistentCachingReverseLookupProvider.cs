@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using Mono.Data.Sqlite;
+using System.Data.SQLite;
 using NLog;
 using Rangic.Utilities.Os;
 
@@ -11,7 +11,7 @@ namespace Rangic.Utilities.Geo
     {
         static private readonly Logger logger = LogManager.GetCurrentClassLogger();
         static private IReverseLookupProvider innerLookupProvider = new OpenStreetMapLookupProvider();
-        static private SqliteConnection databaseConnection;
+        static private SQLiteConnection databaseConnection;
         static private bool creationAttempted;
 
 
@@ -19,7 +19,7 @@ namespace Rangic.Utilities.Geo
         {
             var key = String.Format("{0}, {1}", latitude, longitude);
             var result = GetDataForKey(key);
-            if (result == null)
+            if (result == null && databaseConnection != null)
             {
                 result = innerLookupProvider.Lookup(latitude, longitude);
                 StoreDataForKey(key, result);
@@ -93,7 +93,7 @@ namespace Rangic.Utilities.Geo
             }
         }
 
-        static private SqliteConnection GetConnection()
+        static private SQLiteConnection GetConnection()
         {
             if (databaseConnection == null && creationAttempted == false)
             {
@@ -103,7 +103,7 @@ namespace Rangic.Utilities.Geo
             return databaseConnection;
         }
 
-        static private SqliteConnection OpenOrCreate()
+        static private SQLiteConnection OpenOrCreate()
         {
             try
             {
@@ -119,10 +119,10 @@ namespace Rangic.Utilities.Geo
                 if (!databaseExists)
                 {
                     logger.Warn("Creating location cache file: {0}", dbPath);
-                    SqliteConnection.CreateFile(dbPath);
+                    SQLiteConnection.CreateFile(dbPath);
                 }
 
-                var connection = new SqliteConnection("Data Source=" + dbPath);
+                var connection = new SQLiteConnection("Data Source=" + dbPath);
 
                 if (!databaseExists)
                 {

@@ -10,7 +10,8 @@ namespace Rangic.Utilities.Geo
     {
         static private readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-        static public string UrlBaseAddress = "http://open.mapquestapi.com/";
+        static public string DefaultBaseAddress = "http://open.mapquestapi.com/";
+        static public string UrlBaseAddress = DefaultBaseAddress;
 
 
         public string Lookup(double latitude, double longitude)
@@ -25,6 +26,11 @@ namespace Rangic.Utilities.Geo
                         "nominatim/v1/reverse?key=Uw7GOgmBu6TY9KGcTNoqJWO7Y5J6JSxg&format=json&lat={0}&lon={1}&addressdetails=1&zoom=18&accept-language=en-us",
                         latitude,
                         longitude);
+
+                    if (UrlBaseAddress == DefaultBaseAddress)
+                    {
+                        logger.Info("Calling {0} for {1}, {2}", UrlBaseAddress, latitude, longitude);
+                    }
 
                     client.BaseAddress = new Uri(UrlBaseAddress);
                     var task = client.GetAsync(requestUrl);

@@ -10,7 +10,7 @@ namespace Rangic.Utilities.Geo
     {
         static private readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-        static public string DefaultBaseAddress = "http://open.mapquestapi.com/";
+        static public readonly string DefaultBaseAddress = "http://open.mapquestapi.com/";
         static public string UrlBaseAddress = DefaultBaseAddress;
 
 

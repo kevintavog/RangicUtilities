@@ -14,7 +14,7 @@ namespace Rangic.Utilities.Geo
         static private IReverseLookupProvider innerLookupProvider = new OpenStreetMapLookupProvider();
         static private ThreadLocal<SQLiteConnection> databaseConnection = new ThreadLocal<SQLiteConnection>();
         static private bool? creationFailed;
-
+        static private Object lockObject = new object();
 
 
         public string Lookup(double latitude, double longitude)
@@ -34,28 +34,31 @@ namespace Rangic.Utilities.Geo
         {
             try
             {
-                string result = null;
-                var db = GetConnection();
-                if (db != null)
+                lock(lockObject)
                 {
-                    db.Open();
-                    using (var command = db.CreateCommand())
+                    string result = null;
+                    var db = GetConnection();
+                    if (db != null)
                     {
-                        command.CommandType = System.Data.CommandType.Text;
-                        command.CommandText = "SELECT fullPlacename FROM LocationCache WHERE geoLocation = @key";
-                        command.Parameters.AddWithValue("@key", key);
-                        using (var reader = command.ExecuteReader())
+                        db.Open();
+                        using (var command = db.CreateCommand())
                         {
-                            while (reader.Read())
+                            command.CommandType = System.Data.CommandType.Text;
+                            command.CommandText = "SELECT fullPlacename FROM LocationCache WHERE geoLocation = @key";
+                            command.Parameters.AddWithValue("@key", key);
+                            using (var reader = command.ExecuteReader())
                             {
-                                result = reader.GetString(0);
+                                while (reader.Read())
+                                {
+                                    result = reader.GetString(0);
+                                }
                             }
                         }
+                        db.Close();
                     }
-                    db.Close();
+                    
+                    return result;
                 }
-                
-                return result;
             }
             catch (Exception e)
             {
@@ -74,19 +77,22 @@ namespace Rangic.Utilities.Geo
 
             try
             {
-                var db = GetConnection();
-                if (db != null)
+                lock(lockObject)
                 {
-                    db.Open();
-                    using (var command = db.CreateCommand())
+                    var db = GetConnection();
+                    if (db != null)
                     {
-                        command.CommandType = System.Data.CommandType.Text;
-                        command.CommandText = "INSERT INTO LocationCache (geoLocation, fullPlacename) VALUES(@key, @data)";
-                        command.Parameters.AddWithValue("@key", key);
-                        command.Parameters.AddWithValue("@data", data);
-                        command.ExecuteNonQuery();
+                        db.Open();
+                        using (var command = db.CreateCommand())
+                        {
+                            command.CommandType = System.Data.CommandType.Text;
+                            command.CommandText = "INSERT INTO LocationCache (geoLocation, fullPlacename) VALUES(@key, @data)";
+                            command.Parameters.AddWithValue("@key", key);
+                            command.Parameters.AddWithValue("@data", data);
+                            command.ExecuteNonQuery();
+                        }
+                        db.Close();
                     }
-                    db.Close();
                 }
             }
             catch (Exception e)

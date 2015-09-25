@@ -27,10 +27,11 @@ namespace Rangic.Utilities.Geo
                         latitude,
                         longitude);
 
+                    if (String.IsNullOrWhiteSpace(UrlBaseAddress))
+                        UrlBaseAddress = DefaultBaseAddress;
+                    
                     if (UrlBaseAddress == DefaultBaseAddress)
-                    {
                         logger.Info("Calling {0} for {1}, {2}", UrlBaseAddress, latitude, longitude);
-                    }
 
                     client.BaseAddress = new Uri(UrlBaseAddress);
                     var task = client.GetAsync(requestUrl);

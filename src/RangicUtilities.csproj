@@ -62,6 +62,7 @@
     <Compile Include="Os\Platform.cs" />
     <Compile Include="Geo\OpenStreetMapLookupProvider.cs" />
     <Compile Include="Geo\PersistentCachingReverseLookupProvider.cs" />
+    <Compile Include="Process\FfmpegInvoker.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

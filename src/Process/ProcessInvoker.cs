@@ -5,12 +5,14 @@ using System.Diagnostics;
 using System.Threading;
 using System.IO;
 using System.Reflection;
+using System.Collections.Concurrent;
 
 namespace Rangic.Utilities.Process
 {
     abstract public class ProcessInvoker
     {
         static private readonly Logger logger = LogManager.GetCurrentClassLogger();
+        static private ConcurrentDictionary<string,bool> checkedPath = new ConcurrentDictionary<string,bool>();
 
         public int TimeoutSeconds { get; set; }
 
@@ -24,7 +26,7 @@ namespace Rangic.Utilities.Process
 
         public void Run(string commandLine, params object[] args)
         {
-            if (autoCheckProcessPath)
+            if (!checkedPath.ContainsKey(ProcessName))
             {
                 bool canRun = false;
                 try
@@ -36,6 +38,7 @@ namespace Rangic.Utilities.Process
                     logger.Warn("Error invoking {0}: {1}", ProcessName, e);
                 }
 
+                checkedPath.TryAdd(ProcessPath, true);
                 if (!canRun)
                 {
                     throw new InvalidOperationException("Unable to run " + ProcessName);
@@ -49,7 +52,6 @@ namespace Rangic.Utilities.Process
         abstract protected string ProcessPath { get; }
         abstract protected bool CheckProcessPath(string path);
 
-        static private bool autoCheckProcessPath = true;
         private StringBuilder outputBuffer = new StringBuilder(1024);
         private StringBuilder errorBuffer = new StringBuilder(1024);
 

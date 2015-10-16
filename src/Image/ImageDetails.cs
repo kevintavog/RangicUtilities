@@ -3,9 +3,6 @@ using ExifLib;
 using NLog;
 using System.IO;
 using Rangic.Utilities.Geo;
-using System.Drawing;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Rangic.Utilities.Image
 {
@@ -27,16 +24,18 @@ namespace Rangic.Utilities.Image
 
         public void ReloadKeywords()
         {
-            Keywords = new XmpReader(FullPath).Keywords;
+            var xmpReader = new XmpReader(FullPath);
+            Keywords = xmpReader.Keywords;
         }
 
         private void Initialize()
         {
             CreatedTime = new FileInfo(FullPath).CreationTime;
 
+            var usingExifTime = false;
             try
             {
-                using (var exif = new ExifLib.ExifReader(FullPath))
+                using (var exif = new ExifReader(FullPath))
                 {
                     DateTime dt;
                     exif.GetTagValue<DateTime>(ExifTags.DateTimeDigitized, out dt);
@@ -45,7 +44,10 @@ namespace Rangic.Utilities.Image
                     if (dt == DateTime.MinValue)
                         exif.GetTagValue<DateTime>(ExifTags.DateTime, out dt);
                     if (dt != DateTime.MinValue)
+                    {
                         CreatedTime = dt;
+                        usingExifTime = true;
+                    }
 
                     string latRef, longRef;
                     double[] latitude, longitude;
@@ -65,7 +67,13 @@ namespace Rangic.Utilities.Image
                 logger.Warn("Exception reading EXIF data from '{0}': {1}", FullPath, ex);
             }
 
-            ReloadKeywords();
+            var xmpReader = new XmpReader(FullPath);
+            Keywords = xmpReader.Keywords;
+            if (Location == null && xmpReader.Location != null)
+                Location = xmpReader.Location;
+
+            if (!usingExifTime && xmpReader.CreatedTime.HasValue)
+                CreatedTime = xmpReader.CreatedTime.Value;
         }
 
         static private double ConvertLocation(string geoRef, double[] val)

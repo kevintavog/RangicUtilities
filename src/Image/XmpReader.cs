@@ -136,7 +136,10 @@ namespace Rangic.Utilities.Image
                 if (signature.Equals("http://ns.adobe.com/xap/1.0/\0"))
                 {
                     // Parse the XML
-                    var content = new String(reader.ReadChars(dataLength - signature.Length - 2));
+//                    var length = dataLength - signature.Length - 2;
+                    var length = dataLength - signature.Length;
+                    var chars = reader.ReadChars(length);
+                    var content = new String(chars);
                     var firstLen = content.Length;
 
                     int pos = content.LastIndexOf("?>");

@@ -19,7 +19,7 @@ namespace Rangic.Utilities.Process
                     case PlatformID.Unix:
                     case PlatformID.MacOSX:
                         // Mac/Unix specific path to exiftool; it may not be installed...
-                        return "/usr/bin/exiftool";
+                        return "/usr/local/bin/exiftool";
 
                     case PlatformID.Win32NT:
                         return Path.Combine(BaseAppFolder, "Dependencies", "exiftool.exe");

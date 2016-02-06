@@ -17,8 +17,9 @@ namespace Rangic.Utilities.Process
                 switch (Platform.Id)
                 {
                     case PlatformID.Unix:
+                        return "/usr/bin/exiftool";
+
                     case PlatformID.MacOSX:
-                        // Mac/Unix specific path to exiftool; it may not be installed...
                         return "/usr/local/bin/exiftool";
 
                     case PlatformID.Win32NT:

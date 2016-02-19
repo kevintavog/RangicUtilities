@@ -3,7 +3,6 @@ using System.IO;
 using System.Data.SQLite;
 using NLog;
 using Rangic.Utilities.Os;
-using System.Threading;
 
 
 namespace Rangic.Utilities.Geo
@@ -12,16 +11,14 @@ namespace Rangic.Utilities.Geo
     {
         static private readonly Logger logger = LogManager.GetCurrentClassLogger();
         static private IReverseLookupProvider innerLookupProvider = new OpenStreetMapLookupProvider();
-        static private ThreadLocal<SQLiteConnection> databaseConnection = new ThreadLocal<SQLiteConnection>();
-        static private bool? creationFailed;
-        static private Object lockObject = new object();
+        private static readonly Object lockObject = new object();
 
 
         public string Lookup(double latitude, double longitude)
         {
             var key = String.Format("{0}, {1}", latitude, longitude);
             var result = GetDataForKey(key);
-            if (result == null && databaseConnection != null)
+            if (result == null)
             {
                 result = innerLookupProvider.Lookup(latitude, longitude);
                 StoreDataForKey(key, result);
@@ -34,29 +31,24 @@ namespace Rangic.Utilities.Geo
         {
             try
             {
-                lock(lockObject)
+                using (var connection = new SQLiteConnection(("Data Source=" + DatabasePath)))
                 {
                     string result = null;
-                    var db = GetConnection();
-                    if (db != null)
+                    connection.Open();
+                    using (var command = connection.CreateCommand())
                     {
-                        db.Open();
-                        using (var command = db.CreateCommand())
+                        command.CommandType = System.Data.CommandType.Text;
+                        command.CommandText = "SELECT fullPlacename FROM LocationCache WHERE geoLocation = @key";
+                        command.Parameters.AddWithValue("@key", key);
+                        using (var reader = command.ExecuteReader())
                         {
-                            command.CommandType = System.Data.CommandType.Text;
-                            command.CommandText = "SELECT fullPlacename FROM LocationCache WHERE geoLocation = @key";
-                            command.Parameters.AddWithValue("@key", key);
-                            using (var reader = command.ExecuteReader())
+                            while (reader.Read())
                             {
-                                while (reader.Read())
-                                {
-                                    result = reader.GetString(0);
-                                }
+                                result = reader.GetString(0);
                             }
                         }
-                        db.Close();
                     }
-                    
+
                     return result;
                 }
             }
@@ -77,21 +69,16 @@ namespace Rangic.Utilities.Geo
 
             try
             {
-                lock(lockObject)
+                using (var connection = new SQLiteConnection(("Data Source=" + DatabasePath)))
                 {
-                    var db = GetConnection();
-                    if (db != null)
+                    connection.Open();
+                    using (var command = connection.CreateCommand())
                     {
-                        db.Open();
-                        using (var command = db.CreateCommand())
-                        {
-                            command.CommandType = System.Data.CommandType.Text;
-                            command.CommandText = "INSERT INTO LocationCache (geoLocation, fullPlacename) VALUES(@key, @data)";
-                            command.Parameters.AddWithValue("@key", key);
-                            command.Parameters.AddWithValue("@data", data);
-                            command.ExecuteNonQuery();
-                        }
-                        db.Close();
+                        command.CommandType = System.Data.CommandType.Text;
+                        command.CommandText = "INSERT INTO LocationCache (geoLocation, fullPlacename) VALUES(@key, @data)";
+                        command.Parameters.AddWithValue("@key", key);
+                        command.Parameters.AddWithValue("@data", data);
+                        command.ExecuteNonQuery();
                     }
                 }
             }
@@ -101,60 +88,41 @@ namespace Rangic.Utilities.Geo
             }
         }
 
-        static private SQLiteConnection GetConnection()
-        {
-            if (creationFailed.HasValue && creationFailed == true)
-                return null;
-            
-            if (!databaseConnection.IsValueCreated)
-            {
-                databaseConnection.Value = OpenOrCreate();
+        static private string DatabasePath { get { return Path.Combine(DatabaseFolder, "location.cache"); } }
+        static private string DatabaseFolder { get { return Path.Combine(Platform.UserDataFolder("Rangic"), "Location"); } }
 
-                creationFailed = databaseConnection.Value == null;
-            }
-            return databaseConnection.Value;
-        }
-
-        static private SQLiteConnection OpenOrCreate()
+        static private void EnsureExists(SQLiteConnection connection)
         {
             try
             {
-                var dbFolder = Path.Combine(Platform.UserDataFolder("Rangic"), "Location");
-                var dbPath = Path.Combine(dbFolder, "location.cache");
-                if (!Directory.Exists(dbFolder))
+                if (!File.Exists(DatabasePath))
                 {
-                    logger.Warn("Creating location cache folder: {0}", dbFolder);
-                    Directory.CreateDirectory(dbFolder);
-                }
-
-                var databaseExists = File.Exists(dbPath);
-                if (!databaseExists)
-                {
-                    logger.Warn("Creating location cache file: {0}", dbPath);
-                    SQLiteConnection.CreateFile(dbPath);
-                }
-
-                var connection = new SQLiteConnection("Data Source=" + dbPath);
-
-                if (!databaseExists)
-                {
-                    logger.Warn("Creating cache schema");
-                    connection.Open();
-                    using (var command = connection.CreateCommand())
+                    lock(lockObject)
                     {
-                        command.CommandText = "CREATE TABLE IF NOT EXISTS LocationCache (geoLocation TEXT PRIMARY KEY, fullPlacename TEXT)";
-                        command.CommandType = System.Data.CommandType.Text;
-                        command.ExecuteNonQuery();
+                        if (!File.Exists(DatabasePath))
+                        {
+                            if (!Directory.Exists(DatabaseFolder))
+                            {
+                                logger.Warn("Creating location cache folder: {0}", DatabaseFolder);
+                                Directory.CreateDirectory(DatabaseFolder);
+                            }
+
+                            logger.Warn("Creating cache schema");
+                            connection.Open();
+                            using (var command = connection.CreateCommand())
+                            {
+                                command.CommandText = "CREATE TABLE IF NOT EXISTS LocationCache (geoLocation TEXT PRIMARY KEY, fullPlacename TEXT)";
+                                command.CommandType = System.Data.CommandType.Text;
+                                command.ExecuteNonQuery();
+                            }
+                        }
                     }
-                    connection.Close();
                 }
-                return connection;
             }
             catch (Exception e)
             {
                 logger.Error("Unable to open or create database cache: {0}", e.ToString());
             }
-            return null;
         }
     }
 }
